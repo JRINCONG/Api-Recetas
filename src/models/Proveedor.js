@@ -24,7 +24,7 @@ const Proveedor = sequelize.define('provedore', {
     direccion: {
         type: DataTypes.TEXT,
         allowNull: false
-    },
+    }
 });
 
 module.exports = Proveedor;

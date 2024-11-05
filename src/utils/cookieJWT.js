@@ -2,10 +2,10 @@ const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
-const verifyJWT = (req, res, next) => {
-    const authHeader = req.headers.authorization || req.headers.Authorization;    
-    if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(401);
-    const token = authHeader.split(' ')[1]; 
+const cookieJWT = (req, res, next) => {
+    const authHeader = req.headers.cookie || req.headers.cookie;    
+    if (!authHeader?.startsWith('Recetasjr=')) return res.sendStatus(401);
+    const token = authHeader.split('=')[1]; 
     jwt.verify(
         token,
         process.env.TOKEN_SECRET,
@@ -17,4 +17,4 @@ const verifyJWT = (req, res, next) => {
     )
 }
 
-module.exports = {verifyJWT};
+module.exports = {cookieJWT};

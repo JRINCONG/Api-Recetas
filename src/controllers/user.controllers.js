@@ -58,11 +58,25 @@ if(!user) return res.status(404).json({"Data":"Error"})
       })
       res.setHeader('Set-Cookie',serialized)
 
-   res.status(201).json({"message":"succesfully"})
+   res.status(201).json({"message":"succesfully",token})
 })
 
+const Logged = catchError(async(req,res)=>{
+  const { email } = req.user
+  const results = await User.findOne({where :{email}})
+  if(!results) res.status(404).json({"message":"User not found"})
+
+   const datos={
+             name:results.name,
+             email:results.email,
+             phone:results.phone
+     }
+ 
+    res.status(200).json(datos)
+})
 module.exports = {
     getAll,
     Create,
-    Login
+    Login,
+    Logged
 }

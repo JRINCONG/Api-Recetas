@@ -4,6 +4,8 @@ const User = require('../models/User');
 
 
 const getAll = catchError(async(req, res) => {
+   const user = await User.findOne({where:{email:req.user.email}})
+   if(!user) return res.status(404).json({"Data":"No Autorizado"})
    const resuls = await  Articulo.findAll()
    return res.status(200).json(resuls)
 });
@@ -21,15 +23,20 @@ const Create = catchError(async(req, res)=>{
 
 
 const Update = catchError(async(req, res)=>{
-
+    
+    const user = await User.findOne({where:{email:req.user.email}})
+   if(!user) return res.status(404).json({"Data":"No Autorizado"})
     const id = parseInt(req.params.id)
     const {items, cantidad, tipo, unidad_M, costo_unitario, fecha_vencimiento,fecha_ingreso } = req.body
     delete req.body.id
-    const results = await Articulo.update({where:{id}})
+    const results = await Articulo.update(req.body, {where:{id}, returning: true})
+    if(!results[0] === 0) return res.status(404).json({"Data":"Don't article Update"})
     
+    res.status(200).json(results[1][0])
 })
 
 module.exports = {
     getAll,
-    Create
+    Create,
+    Update
 }

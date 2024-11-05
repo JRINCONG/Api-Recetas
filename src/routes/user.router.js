@@ -1,6 +1,7 @@
-const { getAll, Create, Login } = require('../controllers/user.controllers');
+const { getAll, Create, Login, Logged } = require('../controllers/user.controllers');
 const express = require('express');
 const {verifyJWT} = require('../utils/verifyJWT')
+const { cookieJWT } = require('../utils/cookieJWT')
 const routerUser = express.Router();
 
 routerUser.route('/')
@@ -9,4 +10,8 @@ routerUser.route('/')
     
 routerUser.route('/login')
       .post(Login)
+
+routerUser.route('/me')
+     .get(verifyJWT,cookieJWT, Logged)
+     
 module.exports = routerUser;

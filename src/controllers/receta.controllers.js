@@ -20,9 +20,11 @@ const getAll = catchError(async(req, res) => {
 
 
 const Create = catchError(async(req, res)=>{
-     
-    const {nombre, T_preparacion, T_coccion, imagen , video} = req.body
-    console.log(req.body)
+    let nombre = req.body.nombre.toLowerCase()
+    const unique_nombre = await Recetas.findOne({where:{nombre}})
+    if(unique_nombre) return res.status(404).json({"Data":"NO puedes Repetir la Receta"})
+    const { T_preparacion, T_coccion, imagen , video} = req.body
+     nombre = req.body.nombre.toLowerCase()
     const Recet ={
         nombre,
         T_preparacion,
@@ -30,6 +32,7 @@ const Create = catchError(async(req, res)=>{
         imagen,
         video
     }
+    console.log("Nuevo objato", Recet)
     const results = await Recetas.create(Recet)
 
     if(!results) return res.status(404).json({"Data":"Don't create receta"})

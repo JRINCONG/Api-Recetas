@@ -13,7 +13,7 @@ const Inventario = sequelize.define('inventario', {
         allowNull: false
     },
     unidad: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false
     },
 

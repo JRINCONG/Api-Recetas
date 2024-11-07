@@ -11,6 +11,14 @@ const Articulo = sequelize.define('articulo', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
+    cantidad_restante: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    cantidad_minima: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
 
     tipo:{
         type: DataTypes.STRING,
@@ -21,7 +29,7 @@ const Articulo = sequelize.define('articulo', {
         allowNull: false
     },
     costo_unitario: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false
     },
 
@@ -33,6 +41,10 @@ const Articulo = sequelize.define('articulo', {
     fecha_ingreso:{
         type:DataTypes.DATE,
         allowNull:false
+    },
+    imagen:{
+        type:DataTypes.TEXT,
+        allowNull:true,
     }
 });
 

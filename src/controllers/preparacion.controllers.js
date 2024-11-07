@@ -13,7 +13,8 @@ const getAll = catchError(async(req, res) => {
 });
 
 const Create = catchError(async(req, res)=>{
-    const {email} = req.user
+    const {email, id} = req.user
+    console.log("USUario logueado",req.user)
 const user = await User.findOne({where:{email}})
 
 if(user.tipo === "admin"){      
@@ -28,8 +29,8 @@ if(user.tipo === "admin"){
             transfer.nombre_receta = receta.nombre
             const RecetaIngre = await Receta_Ingre.findAll({where:{recetumId:receta.id}})
             const results = await Preparacion.create(transfer)
-            InventariosAdd([...RecetaIngre],results)
-           return res.status(200).json(results)
+            const Respuesta = InventariosAdd(RecetaIngre,req.user)
+           return res.status(200).json(Respuesta)
     }
         return res.status(404).json({"message":"Usuario no Autorizado"})
 })

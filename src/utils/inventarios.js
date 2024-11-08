@@ -2,49 +2,49 @@ const Articulos =require('../models/Articulo');
 const Inventario = require('../models/Inventario')
 const User =require('../models/User');
  
-
-const InventariosAdd = async(RecetaIngr, users)=>{
- let array=[]
- let new_inventario={}
-
-  const user = await User.findOne({where:{email:users.email}})
-  
-    RecetaIngr.map(async(item, index)=>{
-     const articulo = await Articulos.findOne({where:{id:item.articuloId}})
-
-     const Invent_articulo = await Inventario.findOne({where:{articuloId:item.articuloId}})
-     const InvSumatoria = await Inventario.findAll({where:{articuloId:item.articuloId}})
-     console.log("Este es Items", item)
-     console.log("Invent_articulo", Invent_articulo)    
+const SumarRecetas = async (sumar)=>{
+let suma=0;
+ console.log("Este es sumar en la funcion",sumar)
+  sumar.map((items)=>{
    
+        suma += items.cantidad
+  })
+ 
+return suma
 
+}
+
+const InventariosAdd = async(RecetaIngr, users, req)=>{
+ let new_inventario={}
+   const Sumatoria = await SumarRecetas([...RecetaIngr])
+   console.log("Esta es sumatoria", Sumatoria)
+  const user = await User.findOne({where:{email:users.email}})
+  //realizar un ciclo para poder sumar todas las cantidades de la receta
+    RecetaIngr.map(async(item, index)=>{
+     
+      const articulo = await Articulos.findOne({where:{id:item.articuloId}})
+
+     //const Invent_articulo = await Inventario.findOne({where:{articuloId:item.articuloId}})
+     let CantidadDisponible= articulo.cantidad_restante * req.cantidad
+     const vlr = Math.round(req.catidad/120)
+     console.log("Valor =====>>>", vlr)
    const hoy= new Date()
-   console.log()
-          if(Invent_articulo)
-          {
-            
-               new_inventario = {
+             //const Cant = articulo.cantidad_restante - (item.cantidad * vlr)
+       
+              const new_inventario = {
                           nombre:articulo.items,
-                          cantidad_disponible: item.cantidad,
+                          cantidad_disponible: item.cantidad * vlr,
                           unidad:articulo.unidad_M,
                           fecha : new Date(hoy),
                           articuloId:articulo.id,
                           userId:user.id
                    }
-          }else{
-
-                 new_inventario = {
-                  nombre:articulo.items,
-                  cantidad_disponible: item.cantidad,
-                  unidad:articulo.unidad_M,
-                  fecha : new Date(hoy),
-                  articuloId:articulo.id,
-                  userId:user.id
-                }
-          }
-      console.log("El nuevo Objeto",  new_inventario)
-      const Result =  await Inventario.create( new_inventario)
-      if(Result) return ({"message":"Descargado exitosamente"})
+      
+      console.log("El nuevo Objeto========>>>>",  new_inventario)
+     
+     // const Update = await Articulos.update({where:{id:articulo.id}})
+      const Result =  await Inventario.create(new_inventario)
+      return ({"message":"Descargado exitosamente"})
     
 
    

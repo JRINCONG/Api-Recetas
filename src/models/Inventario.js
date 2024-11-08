@@ -9,7 +9,7 @@ const Inventario = sequelize.define('inventario', {
     },
     
     cantidad_disponible: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BIGINT,
         allowNull: false
     },
     unidad: {

@@ -13,7 +13,8 @@ const Articulo = sequelize.define('articulo', {
     },
     cantidad_restante: {
         type: DataTypes.INTEGER,
-        allowNull: true
+        allowNull: true,
+        defaultValue:0
     },
     cantidad_minima: {
         type: DataTypes.INTEGER,

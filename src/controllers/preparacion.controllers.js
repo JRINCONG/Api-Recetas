@@ -29,7 +29,7 @@ if(user.tipo === "admin"){
             transfer.nombre_receta = receta.nombre
             const RecetaIngre = await Receta_Ingre.findAll({where:{recetumId:receta.id}})
             const results = await Preparacion.create(transfer)
-            const Respuesta = InventariosAdd(RecetaIngre,req.user)
+            const Respuesta = InventariosAdd(RecetaIngre,req.user,req.body)
            return res.status(200).json(Respuesta)
     }
         return res.status(404).json({"message":"Usuario no Autorizado"})

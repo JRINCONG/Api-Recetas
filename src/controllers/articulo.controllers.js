@@ -11,14 +11,16 @@ const getAll = catchError(async(req, res) => {
 });
 
 const Create = catchError(async(req, res)=>{
-    let items= req.body.items.toLowerCase()
+   
+    let items= req.body.items?.toLowerCase()
+    if(!items) return res.status(404).json({"message":"Not Found"})
     const Items_existente = await Articulo.findOne({where:{items}})
     if(Items_existente) return res.status(404).json({"message":"Articulo ya existe"})
 
     const user= await User.findOne({where:{email:req.user.email}})
     if(!user) return res.status(404).json('usuario no valido')
      items= req.body.items.toLowerCase()
-   console.log("estes es el nombre", items)
+ 
     const results = await Articulo.create({...req.body, userId:user.id,items})
 
     if(!results) return res.status(404).json({"Data":"Articulo no Creado"})

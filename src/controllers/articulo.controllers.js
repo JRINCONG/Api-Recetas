@@ -12,9 +12,9 @@ const getAll = catchError(async(req, res) => {
 
 const Create = catchError(async(req, res)=>{
    
-    let item= req.body.items?.toLowerCase()
-    if(!item) return res.status(404).json({"message":"Not Found"})
-    const Items_existente = await Articulo.findOne({where:{item}})
+    let items= req.body.items.toLowerCase()
+    if(!items) return res.status(404).json({"message":"Not Found"})
+    const Items_existente = await Articulo.findOne({where:{items}})
     if(Items_existente) return res.status(404).json({"message":"Articulo ya existe"})
 
     const user= await User.findOne({where:{email:req.user.email}})

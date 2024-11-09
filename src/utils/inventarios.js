@@ -6,25 +6,29 @@ const catchError = require('./catchError');
  
 const SumarRecetas = async (sumar)=>{
 let suma=0;
-   sumar.map((items, index)=>{   
+   sumar.map((items)=>{   
         suma += items.cantidad       
   })  
 return suma
 }
 
 const ArticId = (ArticId)=>{
-    return ArticId.map((items)=>{
-        return items.articuloId
-     })
+  return valor = ArticId.map((items, index)=>{
+          return items.articuloId
+   })
 }
 
-const  InventariosAdd = async(RecetaIngr, users, req)=>{
+const  InventariosAdd = async(RecetaIngr, users, req,receta)=>{
  let new_inventario={}
  let Result=[]
-
+ let conta =0;
+ let ArryArticulos=[]
  //funcion para sumar los gramos de cada ingrediente
    const Sumatoria = SumarRecetas([...RecetaIngr])
-   
+  const Stlen =  ArticId([...RecetaIngr])
+  
+
+  console.log("Cantidad de articulos", Stlen.length)
    //Buscamos el usuario que esta logueado
  // const user = await User.findOne({where:{email:users.email}})
   //if(!user) return {"message":"Not found"}
@@ -42,9 +46,10 @@ return Result = Promise.all(RecetaIngr.map(async(item)=>{
         const hoy = new Date()
              const Cant = articulo.cantidad_restante - (item.cantidad * vlr)
            const minimo = articulo.cantidad_restante - articulo.cantidad_minima
-        if(articulo.cantidad >= articulo.cantidad_restante && articulo.cantidad_minima < articulo.cantidad_restante){
+           //validando el incventario
+        if(articulo.cantidad_restante > articulo.cantidad_minima){
 
-                if(minimo > Cant ){             
+                  
   
                         const new_inventario = {
                                     nombre:articulo.items,
@@ -53,13 +58,12 @@ return Result = Promise.all(RecetaIngr.map(async(item)=>{
                                     fecha : new Date(hoy),
                                     articuloId:articulo.id,
                                     userId:users
-                            }                                 
+                            }  
+                                                                               
                             await  Articulos.update({cantidad_restante:Cant},{where:{id:articulo.id}})
                             const INV =  await  Inventario.create(new_inventario)
                             return ({"message":"Receta descargada del Inventario"})
-                     } else{
-                      return {"mssage":`Inventario escaso de ${articulo.items}` }
-                     }
+                          
                   }else{
                        
                       return {"mssage":`Invantario escaso de ${articulo.items}` }

@@ -1,57 +1,80 @@
+const { response } = require('express');
 const Articulos =require('../models/Articulo');
 const Inventario = require('../models/Inventario')
 const User =require('../models/User');
+const catchError = require('./catchError');
  
 const SumarRecetas = async (sumar)=>{
 let suma=0;
- console.log("Este es sumar en la funcion",sumar)
-  sumar.map((items)=>{
-   
-        suma += items.cantidad
-  })
- 
+   sumar.map((items, index)=>{   
+        suma += items.cantidad       
+  })  
 return suma
-
 }
 
-const InventariosAdd = async(RecetaIngr, users, req)=>{
+const ArticId = (ArticId)=>{
+    return ArticId.map((items)=>{
+        return items.articuloId
+     })
+}
+
+const  InventariosAdd = async(RecetaIngr, users, req)=>{
  let new_inventario={}
-   const Sumatoria = await SumarRecetas([...RecetaIngr])
-   console.log("Esta es sumatoria", Sumatoria)
-  const user = await User.findOne({where:{email:users.email}})
+ let Result=[]
+
+ //funcion para sumar los gramos de cada ingrediente
+   const Sumatoria = SumarRecetas([...RecetaIngr])
+   
+   //Buscamos el usuario que esta logueado
+ // const user = await User.findOne({where:{email:users.email}})
+  //if(!user) return {"message":"Not found"}
   //realizar un ciclo para poder sumar todas las cantidades de la receta
-    RecetaIngr.map(async(item, index)=>{
+  
+
+return Result = Promise.all(RecetaIngr.map(async(item)=>{
      
       const articulo = await Articulos.findOne({where:{id:item.articuloId}})
 
-     //const Invent_articulo = await Inventario.findOne({where:{articuloId:item.articuloId}})
-     let CantidadDisponible= articulo.cantidad_restante * req.cantidad
-     const vlr = Math.round(req.catidad/120)
-     console.log("Valor =====>>>", vlr)
-   const hoy= new Date()
-             //const Cant = articulo.cantidad_restante - (item.cantidad * vlr)
-       
-              const new_inventario = {
-                          nombre:articulo.items,
-                          cantidad_disponible: item.cantidad * vlr,
-                          unidad:articulo.unidad_M,
-                          fecha : new Date(hoy),
-                          articuloId:articulo.id,
-                          userId:user.id
-                   }
-      
-      console.log("El nuevo Objeto========>>>>",  new_inventario)
-     
-     // const Update = await Articulos.update({where:{id:articulo.id}})
-      const Result =  await Inventario.create(new_inventario)
-      return ({"message":"Descargado exitosamente"})
-    
+     //Calculando la cantidad que enviaron a preparar para un plato que seria 120
+     // la vlr seria la cantidad de cada ingrediente a preparar 
+     const vlr = Math.floor(req.catidad/120)
+       const valor = articulo.cantidad_restante + item.cantidad * vlr
+        const hoy = new Date()
+             const Cant = articulo.cantidad_restante - (item.cantidad * vlr)
+           const minimo = articulo.cantidad_restante - articulo.cantidad_minima
+        if(articulo.cantidad >= articulo.cantidad_restante && articulo.cantidad_minima < articulo.cantidad_restante){
+
+                if(minimo > Cant ){             
+  
+                        const new_inventario = {
+                                    nombre:articulo.items,
+                                    cantidad_disponible: item.cantidad * vlr,
+                                    unidad:articulo.unidad_M,
+                                    fecha : new Date(hoy),
+                                    articuloId:articulo.id,
+                                    userId:users
+                            }                                 
+                            await  Articulos.update({cantidad_restante:Cant},{where:{id:articulo.id}})
+                            const INV =  await  Inventario.create(new_inventario)
+                            return ({"message":"Receta descargada del Inventario"})
+                     } else{
+                      return {"mssage":`Inventario escaso de ${articulo.items}` }
+                     }
+                  }else{
+                       
+                      return {"mssage":`Invantario escaso de ${articulo.items}` }
+                      
+                  }
 
    
     
-    })
-    
-    
+
   
+}))
+}  
+module.exports = {
+  InventariosAdd,
+  ArticId,
+  SumarRecetas
+
 }
-module.exports = InventariosAdd

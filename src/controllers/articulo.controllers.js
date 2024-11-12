@@ -36,7 +36,15 @@ const Update = catchError(async(req, res)=>{
     const id = parseInt(req.params.id)
     const {items, cantidad, tipo, unidad_M, costo_unitario, fecha_vencimiento,fecha_ingreso } = req.body
     delete req.body.id
-    const results = await Articulo.update(req.body, {where:{id}, returning: true})
+    const results = await Articulo.findOne({where:{id}})
+    console.log(results)
+    const Add = results.cantidad_restante + cantidad
+    const objeto={
+        cantidad,
+        cantidad_restante:Add
+    }
+    console.log("este es objeto",objeto)
+    const resul = await Articulo.update(objeto,{where:{id}, returning: true})
     if(!results[0] === 0) return res.status(404).json({"Data":"Don't article Update"})
     
     res.status(200).json(results[1][0])

@@ -1,8 +1,8 @@
-const { response } = require('express');
+const { json } = require('sequelize');
 const Articulos =require('../models/Articulo');
 const Inventario = require('../models/Inventario')
 const User =require('../models/User');
-const catchError = require('./catchError');
+
  
 const SumarRecetas = async (sumar)=>{
 let suma=0;
@@ -12,8 +12,8 @@ let suma=0;
 return suma
 }
 
-const ArticId = (ArticId)=>{
-  return valor = ArticId.map((items, index)=>{
+const Array = (array)=>{
+  return valor = array.map((items)=>{
           return items.articuloId
    })
 }
@@ -22,20 +22,21 @@ const  InventariosAdd = async(RecetaIngr, users, req,receta)=>{
  let new_inventario={}
  let Result=[]
  let conta =0;
- let ArryArticulos=[]
+ let ArryArticulosNew=[]
+ let CantidadArticulos=[]
+
  //funcion para sumar los gramos de cada ingrediente
    const Sumatoria = SumarRecetas([...RecetaIngr])
-  const Stlen =  ArticId([...RecetaIngr])
+   //creamos un arreglo con la cantidad de articulos que incluyen la receta
+  const ArrayARticulos =  Array([...RecetaIngr])
   
-
-  console.log("Cantidad de articulos", Stlen.length)
    //Buscamos el usuario que esta logueado
- // const user = await User.findOne({where:{email:users.email}})
-  //if(!user) return {"message":"Not found"}
+  // const user = await User.findOne({where:{email:users.email}})
+  // if(!user) return {"message":"Not found"}
   //realizar un ciclo para poder sumar todas las cantidades de la receta
   
 
-return Result = Promise.all(RecetaIngr.map(async(item)=>{
+return Result = Promise.all(RecetaIngr.map(async(item,index)=>{
      
       const articulo = await Articulos.findOne({where:{id:item.articuloId}})
 
@@ -47,38 +48,50 @@ return Result = Promise.all(RecetaIngr.map(async(item)=>{
              const Cant = articulo.cantidad_restante - (item.cantidad * vlr)
            const minimo = articulo.cantidad_restante - articulo.cantidad_minima
            //validando el incventario
-        if(articulo.cantidad_restante > articulo.cantidad_minima){
-
+        if(Cant  > articulo.cantidad_minima){
                   
-  
-                        const new_inventario = {
+                          const new_inventario = {
                                     nombre:articulo.items,
                                     cantidad_disponible: item.cantidad * vlr,
                                     unidad:articulo.unidad_M,
                                     fecha : new Date(hoy),
                                     articuloId:articulo.id,
                                     userId:users
-                            }  
-                                                                               
-                            await  Articulos.update({cantidad_restante:Cant},{where:{id:articulo.id}})
-                            const INV =  await  Inventario.create(new_inventario)
-                            return ({"message":"Receta descargada del Inventario"})
-                          
+                            }                     
+                               
+                            if(new_inventario)  ArryArticulosNew[conta] = new_inventario
+                                 CantidadArticulos[conta] = Cant
+                                 conta++
+                                 console.log("ArryArticulosNew", ArryArticulosNew)
+                                if(ArrayARticulos.length === ArryArticulosNew.length){
+                                    
+                                   ArryArticulosNew.map(async(arti,index)=>{
+                                  await  Articulos.update({cantidad_restante:CantidadArticulos[index]},{where:{id:arti.articuloId}})
+                                                                  
+                                    const INV =  await Inventario.create(arti)                                     
+                                  })
+                                  
+                                  
+                                                              
+                                }
+                                return json("Faltan Ingredientes a la Receta",ArryArticulosNew)
+                                 
+                                             
+                             
                   }else{
                        
-                      return {"mssage":`Invantario escaso de ${articulo.items}` }
+                      return json("Faltan Ingredientes a la Receta",ArryArticulosNew)
                       
                   }
 
    
-    
-
+                
+                  return ({"message":"Receta descargada del Inventario"})  
   
 }))
 }  
 module.exports = {
   InventariosAdd,
-  ArticId,
   SumarRecetas
 
 }

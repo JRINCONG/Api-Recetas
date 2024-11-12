@@ -32,7 +32,7 @@ const Create = catchError(async(req, res)=>{
         imagen,
         video
     }
-    console.log("Nuevo objato", Recet)
+   
     const results = await Recetas.create(Recet)
 
     if(!results) return res.status(404).json({"Data":"Don't create receta"})

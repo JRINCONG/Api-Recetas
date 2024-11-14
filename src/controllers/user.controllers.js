@@ -5,26 +5,61 @@ const jwt = require('jsonwebtoken')
 const  { serialize } = require('cookie')
 
 const getAll = catchError(async(req, res) => {
-    const results =await User.findAll()
-    return res.status(200).json(results)
+   const {email} = req.user
+   const Users = await User.findOne({where:{email}})
+   
+   if(Users.tipo === "admin"){
+     const results = await User.findAll()
+   
+     if(!results) res.status(404).json({"message":"Usuario no valido"})
+      const Data = results.map((x)=>{
+      return {
+        name:x.name,
+        email:x.email,
+        phone:x.phone,
+        tipo:x.tipo
+      }
+    })
+   
+      return res.status(200).json(Data)
+   }
+    return res.status(404).json({"message":"No autorizado"})
 });
 
 const Create =catchError(async(req, res)=>{
 
-  const { name, email, password, tipo, phone}= req.body
-  const haspassword = await bcrypt.hash(password, 10)
-  const user={
-    name,
-    email,
-    password:haspassword,
-    tipo,
-    phone
+  const { email } = req.user
+  const Users = await User.findOne({where:{email}})
+  if(Users.tipo === "admin"){
+    const haspassword = await bcrypt.hash(req.body.password, 10)
+     req.body.password = haspassword
+     const result = await User.create(req.body)
+     if(!result) return res.status(404).json({"message":"Usuario no Registrado"})
+     const obje ={
+        name:result.name,
+        email:result.email
+    }
+      return res.status(200).json(obje)
   }
-   const result = await User.create(user)
-   if(!result) return res.status(404).json({"Data":"Users not create"})
+  res.status(404).json({"message":"no autorizado"})
 
-    return res.status(200).json(result)
+})
 
+const Update =catchError(async(req, res)=>{
+  const {email} = req.user
+  const Results = await User.findOne({where:{email}})
+  if(!Results) return res.status(404).json({"message":"No autorizado1"})
+   
+    if(Results.tipo ==='admin'){
+    if(req.body.password){
+      const haspassword = await bcrypt.hash(req.body.password, 10)
+      req.body.password = haspassword;
+    }
+   
+    const Resul = await User.update(req.body,{where:{email:req.body.email}, returning:true})
+    return res.status(200).json({"message":"Usuario Actualizado"})
+   }
+   res.status(404).json({"message":"No Autorizado"})
 })
 
 
@@ -77,6 +112,7 @@ const Logged = catchError(async(req,res)=>{
 module.exports = {
     getAll,
     Create,
+    Update,
     Login,
     Logged
 }

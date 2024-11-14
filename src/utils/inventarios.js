@@ -72,17 +72,12 @@ const  InventariosAdd = async(RecetaIngr, users, req,receta)=>{
                                   }) 
                                   return "Receta Descargada del sistema"        
                                                             
-                                }
-                                                               
+                                }                                                               
                              
                   }else{ 
-                   return articulo.items
-                   
-                              
+                   return articulo.items                          
                   } 
                 
-                       
-  
 }))
 }  
 module.exports = {

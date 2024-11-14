@@ -1,4 +1,4 @@
-const { getAll, Create, Update } = require('../controllers/articulo.controllers');
+const { getAll, Create, Update, consulta } = require('../controllers/articulo.controllers');
 const express = require('express');
 const { verifyJWT } = require('../utils/verifyJWT')
 const { cookieJWT } = require('../utils/cookieJWT')
@@ -7,9 +7,13 @@ const routerArticulo = express.Router();
 routerArticulo.route('/')
     .get(verifyJWT, cookieJWT, getAll)
     .post(verifyJWT, Create)
+   
 
 
 routerArticulo.route('/:id')
-     .put(verifyJWT, cookieJWT, Update)    
+     .put(verifyJWT, cookieJWT, Update)
+     
+routerArticulo.route('/consulta')
+      .post(verifyJWT, consulta)
 
 module.exports = routerArticulo;

@@ -14,6 +14,10 @@ const Receta = sequelize.define('receta', {
         type: DataTypes.TIME,
         allowNull: false
     },
+    descripcion: {
+        type: DataTypes.TEXT,
+        allowNull: false
+    },
     imagen: {
         type: DataTypes.TEXT,
         allowNull: false

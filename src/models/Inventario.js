@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, DATEONLY } = require('sequelize');
 const sequelize = require('../utils/connection');
 
 const Inventario = sequelize.define('inventario', {
@@ -23,7 +23,7 @@ const Inventario = sequelize.define('inventario', {
     },
 
     fecha:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         allowNull:false
     },
   

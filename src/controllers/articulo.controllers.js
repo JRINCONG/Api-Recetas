@@ -2,6 +2,7 @@ const catchError = require('../utils/catchError');
 const Articulos = require('../models/Articulo');
 const Articulos_menores= require('../models/Articulos_menores')
 const User = require('../models/User');
+const Inventario = require('../models/Inventario')
 
 
 const getAll = catchError(async(req, res) => {
@@ -44,24 +45,20 @@ const Update = catchError(async(req, res)=>{
         req.body.cantidad_restante = results.cantidad_restante + req.body.cantidad;
     }
 
-    console.log(req.body)
+   
     const resultsUpdte = await Articulos.update(req.body,{where:{id}, returning: true})
-    console.log("Este es resultsUpdte",resultsUpdte)
+    
 
     if(resultsUpdte[0] === 0) return res.status(404).json({"message":"Articulo no Actualizado"})
     
     res.status(200).json({"message":"Articulo Actualizado correctamente"})
 })
 
-const consulta = catchError(async(req,res)=>{
-    const Results = await Articulos_menores.findAll()
-    console.log("Consulta",Results)
-    return res.status(200).json(Results)
-})
 
 module.exports = {
     getAll,
     Create,
     Update,
-    consulta
+    
+    
 }

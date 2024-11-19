@@ -104,7 +104,8 @@ const Logged = catchError(async(req,res)=>{
    const datos={
              name:results.name,
              email:results.email,
-             phone:results.phone
+             phone:results.phone,
+             tipo:results.tipo
      }
  
     res.status(200).json(datos)

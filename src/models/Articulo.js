@@ -35,12 +35,12 @@ const Articulo = sequelize.define('articulo', {
     },
 
     fecha_vencimiento:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         allowNull:false
     },
     
     fecha_ingreso:{
-        type:DataTypes.DATE,
+        type:DataTypes.DATEONLY,
         allowNull:false
     },
     imagen:{

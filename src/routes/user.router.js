@@ -13,6 +13,6 @@ routerUser.route('/login')
       .post(Login)
 
 routerUser.route('/me')
-     .get(verifyJWT,cookieJWT, Logged)
+     .get(verifyJWT, Logged)
      
 module.exports = routerUser;

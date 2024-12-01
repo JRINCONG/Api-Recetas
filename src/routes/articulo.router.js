@@ -5,13 +5,13 @@ const { cookieJWT } = require('../utils/cookieJWT')
 const routerArticulo = express.Router();
 
 routerArticulo.route('/')
-    .get(verifyJWT, cookieJWT, getAll)
+    .get(verifyJWT, getAll)
     .post(verifyJWT, Create)
    
 
 
 routerArticulo.route('/:id')
-     .put(verifyJWT, cookieJWT, Update)
+     .put(verifyJWT, Update)
      
 
 

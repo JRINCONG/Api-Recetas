@@ -14,10 +14,14 @@ const getAll = catchError(async(req, res) => {
      if(!results) res.status(404).json({"message":"Usuario no valido"})
       const Data = results.map((x)=>{
       return {
-        name:x.name,
+        id: x.id,
+        first_Name:x.first_Name,
+        last_Name:x.last_Name,
         email:x.email,
         phone:x.phone,
-        tipo:x.tipo
+        tipo:x.tipo,
+        imagen:x.imagen,
+        cargo:x.cargo
       }
     })
    
@@ -27,13 +31,23 @@ const getAll = catchError(async(req, res) => {
 });
 
 const Create =catchError(async(req, res)=>{
-
-  const { email } = req.user
-  const Users = await User.findOne({where:{email}})
+   //formatear el texto 
+const { first_Name, last_Name, email, phone, tipo, password, imagen,cargo } = req.body 
+  const Users = await User.findOne({where:{email:req.user.email}})
   if(Users.tipo === "admin"){
-    const haspassword = await bcrypt.hash(req.body.password, 10)
-     req.body.password = haspassword
-     const result = await User.create(req.body)
+    const haspassword = await bcrypt.hash(password, 10)
+      const NewUser ={
+      first_Name:first_Name.toLowerCase(),
+      last_Name:last_Name.toLowerCase(),
+      email:email.toLowerCase(),
+      phone,
+      imagen,
+      cargo:cargo.toLowerCase(),
+      password:haspassword,
+      tipo
+    }
+    console.log(NewUser)
+     const result = await User.create(NewUser)
      if(!result) return res.status(404).json({"message":"Usuario no Registrado"})
      const obje ={
         name:result.name,
@@ -67,11 +81,11 @@ const Login = catchError(async(req, res)=>{
 const { email, password } = req.body;
 const user = await User.findOne({where:{email}})
 
-if(!user) return res.status(404).json({"Data":"Error"})
+if(!user) return res.status(404).json({"Data":"Datos invalidos"})
 
  const isValid = await bcrypt.compare(password , user.password ) 
 
- if(!isValid) res.status(404).json({"message":"sorry"})
+ if(!isValid) res.status(404).json({"message":"Datos invalidos"})
 
         const usuario={
           email:user.email,
@@ -97,15 +111,18 @@ if(!user) return res.status(404).json({"Data":"Error"})
 })
 
 const Logged = catchError(async(req,res)=>{
+  console.log(req)
   const { email } = req.user
   const results = await User.findOne({where :{email}})
   if(!results) res.status(404).json({"message":"User not found"})
 
    const datos={
-             name:results.name,
+             first_Name:results.first_Name,
+             last_Name:results.last_Name,
              email:results.email,
              phone:results.phone,
-             tipo:results.tipo
+             tipo:results.tipo,
+             imagen:results.imagen
      }
  
     res.status(200).json(datos)

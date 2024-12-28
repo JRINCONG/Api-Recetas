@@ -2,12 +2,12 @@ const catchError = require('../utils/catchError');
 const User = require('../models/User');
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const  { serialize } = require('cookie')
+
 
 const getAll = catchError(async(req, res) => {
    const {email} = req.user
    const Users = await User.findOne({where:{email}})
-   
+   console.log("controlador")
    if(Users.tipo === "admin"){
      const results = await User.findAll()
    
@@ -33,6 +33,8 @@ const getAll = catchError(async(req, res) => {
 const Create =catchError(async(req, res)=>{
    //formatear el texto 
 const { first_Name, last_Name, email, phone, tipo, password, imagen,cargo } = req.body 
+  const registered = await User.findOne({where:{email}})
+  if(registered) return res.status(404).json({"message":"correo existente"})
   const Users = await User.findOne({where:{email:req.user.email}})
   if(Users.tipo === "admin"){
     const haspassword = await bcrypt.hash(password, 10)
@@ -50,8 +52,13 @@ const { first_Name, last_Name, email, phone, tipo, password, imagen,cargo } = re
      const result = await User.create(NewUser)
      if(!result) return res.status(404).json({"message":"Usuario no Registrado"})
      const obje ={
-        name:result.name,
-        email:result.email
+        first_Name:result.first_Name,
+        last_Name:result.last_Name,
+        email:result.email,
+        phone:result.phone,
+        tipo:result.tipo,
+        imagen:result.imagen,
+        cargo:result.cargo
     }
       return res.status(200).json(obje)
   }
@@ -80,7 +87,6 @@ const Update =catchError(async(req, res)=>{
 const Login = catchError(async(req, res)=>{
 const { email, password } = req.body;
 const user = await User.findOne({where:{email}})
-
 if(!user) return res.status(404).json({"Data":"Datos invalidos"})
 
  const isValid = await bcrypt.compare(password , user.password ) 
@@ -89,29 +95,30 @@ if(!user) return res.status(404).json({"Data":"Datos invalidos"})
 
         const usuario={
           email:user.email,
-          name:user.name
+          name:user.first_Name
          }
-     
+    
          const token = jwt.sign(
-        {usuario},
+        usuario,
         process.env.TOKEN_SECRET,
         {expiresIn:'4h'}
         )
       
-      const serialized = serialize('Recetasjr', token,{
-        httpOnly:true,
-        secure:process.env.NODE_ENV === 'production',
-        sameSite:'none',
-        maxAge:1000*60*60*8*1,
-        path:'/'
+      res.cookie('token', token,{
+        httpOnly: true, // No accesible desde JavaScript del cliente
+        secure: false,//process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+        sameSite: 'strict', // Protege contra CSRF
+        maxAge: 30 * 60 * 1000, // Expira en 30 minutos
+        //path: '/',               // Cookie disponible en todas las rutas
+        //domain: 'localhost' 
       })
-      res.setHeader('Set-Cookie',serialized)
+        
+     
 
-   res.status(201).json({"message":"succesfully",token})
+   res.status(201).json({"message":"exitoso"})
 })
 
 const Logged = catchError(async(req,res)=>{
-  console.log(req)
   const { email } = req.user
   const results = await User.findOne({where :{email}})
   if(!results) res.status(404).json({"message":"User not found"})
@@ -124,13 +131,26 @@ const Logged = catchError(async(req,res)=>{
              tipo:results.tipo,
              imagen:results.imagen
      }
- 
-    res.status(200).json(datos)
+  const token = req.headers.cookie.split('=')[1]
+  
+    res.status(200).json({datos, token})
 })
+
+
+const Logout = catchError(async(req, res)=>{
+   
+   res.clearCookie('token');
+   res.status(200).json({"message":"Closed Sesion"});
+
+})
+
+
 module.exports = {
     getAll,
     Create,
     Update,
     Login,
-    Logged
+    Logged,
+    Logout,
+    
 }

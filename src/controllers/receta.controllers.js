@@ -20,13 +20,13 @@ const getAll = catchError(async(req, res) => {
 
 
 const Create = catchError(async(req, res)=>{
-    let nombre = req.body.nombre.toLowerCase()
-    const unique_nombre = await Recetas.findOne({where:{nombre}})
+    let nombre = req.body.name.toLowerCase()
+    const unique_nombre = await Recetas.findOne({where:{name:nombre}})
     if(unique_nombre) return res.status(404).json({"Data":"NO puedes Repetir la Receta"})
-    const { T_preparacion, T_coccion, imagen, descripcion , video} = req.body
-     nombre = req.body.nombre.toLowerCase()
+    const { name, T_preparacion, T_coccion, imagen, descripcion , video} = req.body
+     nombre = req.body.name.toLowerCase()
     const Recet ={
-        nombre,
+        name:nombre,
         descripcion,
         T_preparacion,
         T_coccion,

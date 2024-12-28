@@ -1,7 +1,6 @@
-const { getAll, Create, Login, Logged, Update } = require('../controllers/user.controllers');
+const { getAll, Create, Login, Logged, Update, Logout } = require('../controllers/user.controllers');
 const express = require('express');
 const {verifyJWT} = require('../utils/verifyJWT')
-const { cookieJWT } = require('../utils/cookieJWT')
 const routerUser = express.Router();
 
 routerUser.route('/')
@@ -14,5 +13,10 @@ routerUser.route('/login')
 
 routerUser.route('/me')
      .get(verifyJWT, Logged)
+
+routerUser.route('/logout')
+     .post(verifyJWT, Logout) 
+
+   
      
 module.exports = routerUser;

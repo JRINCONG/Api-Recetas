@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../utils/connection');
 
 const Receta = sequelize.define('receta', {
-    nombre: {
+    name: {
         type: DataTypes.STRING,
         allowNull: false
     },

@@ -5,8 +5,8 @@ const { cookieJWT } = require('../utils/cookieJWT')
 const routerRecetas = express.Router();
 
 routerRecetas.route('/')
-    .get(verifyJWT, cookieJWT, getAll)
-    .post(verifyJWT, cookieJWT, Create)
+    .get(verifyJWT, getAll)
+    .post(verifyJWT, Create)
 
 
 routerRecetas.route('/:id')
